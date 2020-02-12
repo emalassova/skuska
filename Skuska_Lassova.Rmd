@@ -1,0 +1,86 @@
+---
+title: "Lassova"
+output: html_document
+---
+``` {r}
+library(datasets) 
+library(tidyverse)
+```
+
+Na analyzovanie som použila dáta chickwts obsahujúce údaje z experimentu, pri ktorom bol skúmaný vplyv stravovanie na rast kuriat. Obsahuje údaje o hmotnosti a krmive. Najskôr som si dané dáta nainštalovala a vypísala ich. 
+
+``` {r}
+data("chickwts")
+``` 
+``` {r}
+chickwts
+```
+Summary umožňuje vidieť zosumarizované všetky premenné.
+``` {r}
+summary(chickwts)
+``` 
+
+
+Pomocou rôznych funkckí môžme vypočítať priemer a medián pre jednotlivé druhy krmiva. 
+``` {r}
+median(filter(chickwts, feed == "horsebean")$weight)
+``` 
+``` {r}
+mean(filter(chickwts, feed == "horsebean")$weight)
+``` 
+
+``` {r}
+library(dplyr)
+library(tidyr)
+```
+
+Pri väčšom počte skupín by boli výpočty z predchádzajúceho kroku zdĺhavé a chaotické, preto je lepšie použiť funkciu group_by.
+``` {r}
+chickwts %>%
+  select(feed, weight) %>%
+  filter(feed == "casein" |
+         feed == "horsebean"|
+         feed == "linseed"|
+         feed == "soybean"|
+         feed == "sunflower"|
+         feed == "meatmeal") %>%
+  group_by(feed) %>%
+  summarise(Average_weight = mean(weight))
+``` 
+``` {r}
+chickwts %>%
+  select(feed, weight) %>%
+  filter(feed == "casein" |
+         feed == "horsebean"|
+         feed == "linseed"|
+         feed == "soybean"|
+         feed == "sunflower"|
+         feed == "meatmeal") %>%
+  group_by(feed) %>%
+  summarise(Median_weight = median(weight))
+``` 
+ 
+
+Na zistenie štatisticky významých rozdielov v hmotnostiach kurčiat som použila ANOVA analýzu.
+``` {r}
+anova(fm1 <- lm(weight ~ feed, data = chickwts))
+```
+Na základe p hodnoty 5.936e-10 možno povedať, že hmotnosti kurčiat závisia od krmiva.
+Ovplyvňovanie hmotnosti krmivom možno pozorovať pri hodnotách priemeru, ale i pri grafickom zobrazení dát. 
+
+Na vizualizáciu dát som použila ggplot2.  Pomocou _aes_ som určila, čo sa bude nachádzať na x-ovej osi, na y-ovej osi, jednotlivé druhy krmiva sú rozlíšené aj farebne.
+   
+```{r}
+library(ggplot2)
+ggplot(data = chickwts) +
+  geom_point(mapping = aes(y = weight, x = feed, colour = feed))
+```
+
+
+Na grafické zobrazenie dát je vhodné použiť iný typ grafu, najideálnejší je boxplot.
+``` {r}
+head(chickwts)
+attach(chickwts)
+boxplot(weight~feed)
+```
+Na základe grafov možno povedať, že konzumáciou kazeínu a slnečníc dosiahli kurčatá najväčšiu hmotnosť, zatiaľ čo najnižšiu hmotnosť mali tie, ktoré konzumovali bôb. 
