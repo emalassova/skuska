@@ -11,8 +11,6 @@ Na analyzovanie som použila dáta chickwts obsahujúce údaje z experimentu, pr
 
 ``` {r}
 data("chickwts")
-``` 
-``` {r}
 chickwts
 ```
 Summary umožňuje vidieť zosumarizované všetky premenné.
